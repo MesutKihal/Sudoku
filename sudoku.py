@@ -1,10 +1,12 @@
 import pygame
 import sys
 import random
+import concurrent.futures
+import time
 
 for i in range(1,82):
-        choice = random.choice([0,0,random.randint(1,9)])
-        exec("var"+str(i)+" ="+str(choice))
+        level1 = [8,0,7,9,4,0,3,1,0,0,3,1,0,7,6,4,0,0,0,0,0,1,0,0,0,5,0,9,0,0,5,0,0,0,0,0,0,0,0,0,0,0,1,6,0,1,0,5,3,0,7,0,2,4,0,0,3,0,0,2,6,9,1,0,1,0,6,9,3,0,4,0,4,0,0,7,0,0,2,3,8]
+        exec("var"+str(i)+" ="+str(level1[i-1]))
 
 def Play():
         pygame.init()
@@ -12,7 +14,9 @@ def Play():
         light_sky_blue = (135,206,250)
         dodger_blue = (30,144,255)
         black = (0,0,0)
+        red = (255,0,0)
         table = [var1,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,var15,var16,var17,var18,var19,var20,var21,var22,var23,var24,var25,var26,var27,var28,var29,var30,var31,var32,var33,var34,var35,var36,var37,var38,var39,var40,var41,var42,var43,var44,var45,var46,var47,var48,var49,var50,var51,var52,var53,var54,var55,var56,var57,var58,var59,var60,var61,var62,var63,var64,var65,var66,var67,var68,var69,var70,var71,var72,var73,var74,var75,var76,var77,var78,var79,var80,var81,]
+        
         font = pygame.font.SysFont('verdana', 20)
         screen_width = 460
         screen_height = 370
@@ -21,8 +25,8 @@ def Play():
         icon = pygame.image.load("sudoku.png")
         pygame.display.set_icon(icon)
         clock = pygame.time.Clock()
-        time = 0
-        def Time_Count(seconds):
+        T = 0
+        def T_Count(seconds):
                 try:
                         minutes = seconds // 60
                         seconds %= minutes
@@ -40,8 +44,8 @@ def Play():
                 y = 1
                 index = 0
                 pygame.draw.rect(screen,white,(25,25,410,275))
-                time_txt = font.render("Time: "+Time_Count(time//6),True, black)
-                screen.blit(time_txt, (170,310))
+                T_txt = font.render("T: "+T_Count(T//6),True, black)
+                screen.blit(T_txt, (170,310))
                 for var in table:
                         if var == 0:
                                 temp = font.render(str(" "), True, black)
@@ -65,17 +69,39 @@ def Play():
                                 else:
                                         pygame.draw.rect(screen,dodger_blue,(x*45-15,y*30,40,25))
                                 screen.blit(temp,(x*45,y*30))
-                        mouse = pygame.mouse.get_pos()
-                        click = pygame.mouse.get_pressed()
-                        if x*45-15 < mouse[0] < x*45+25 and y*30 < mouse[1] < y*30+25 and click[0]:
-                                if table[(y*10+x)-y-10] == 9:
-                                        table[(y*10+x)-y-10] = 1
-                                else:
-                                        table[(y*10+x)-y-10] += 1
                         index += 1     
                         x += 1
-                time += 1
+
+                mouse = pygame.mouse.get_pos()
+                click = pygame.mouse.get_pressed()
+
+                y = 1
+                def add_one(x):
+                    if x*45-15 < mouse[0] < x*45+25 and y*30 < mouse[1] < y*30+25:
+                        if table[(y*10+x)-y-10] == 9:
+                            table[(y*10+x)-y-10] = 1
+                        else:
+                            table[(y*10+x)-y-10] += 1
+                        return True
+                    else:
+                        return False
+
+                itr = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81]
+                if click[0]:
+                        with concurrent.futures.ThreadPoolExecutor() as executor:
+                            
+                            futures = executor.map(add_one, itr)
+                            
+                            while True:
+                                if any(rsl for rsl in futures):
+                                    break
+                                else:
+                                    y += 1
+                                    futures = executor.map(add_one, itr)
+
+                T += 1
                 pygame.display.update()
+
 
 def Menu():
         pygame.init()
@@ -116,22 +142,3 @@ def Menu():
                 screen.blit(start_txt,(btn_x+45,btn_y))
                 pygame.display.update()
 Menu()
-#Check horizontally
-'''
-x = 2
-i = 12
-j = 0
-while 12 <= i <= 12+2:
-	while j < 3:
-		if i != 14 and j != 2:
-			if arr[i][j] == x:
-				print((i, j))
-		j += 1
-	j = 0
-	i += 1
-'''
-'''Check vertically'''
-#i = 0
-#while i <= 24:
-#	print(arr[i][1])
-#	i += 3
