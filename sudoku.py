@@ -3,23 +3,20 @@ import sys
 import random
 import concurrent.futures
 import time
-
-
-
-for i in range(1,82):
-        levels = [8,0,7,9,4,0,3,1,0,0,3,1,0,7,6,4,0,0,0,0,0,1,0,0,0,5,0,9,0,0,5,0,0,0,0,0,0,0,0,0,0,0,1,6,0,1,0,5,3,0,7,0,2,4,0,0,3,0,0,2,6,9,1,0,1,0,6,9,3,0,4,0,4,0,0,7,0,0,2,3,8]
-        exec("var"+str(i)+" ="+str(levels[i-1]))
+ 
+i = 0
 
 def Play():
- 
+        global i
         pygame.init()
         white = (255,255,255)
         light_sky_blue = (135,206,250)
         dodger_blue = (30,144,255)
         black = (0,0,0)
         red = (255,0,0)
-                
-        table = [var1,var2,var3,var4,var5,var6,var7,var8,var9,var10,var11,var12,var13,var14,var15,var16,var17,var18,var19,var20,var21,var22,var23,var24,var25,var26,var27,var28,var29,var30,var31,var32,var33,var34,var35,var36,var37,var38,var39,var40,var41,var42,var43,var44,var45,var46,var47,var48,var49,var50,var51,var52,var53,var54,var55,var56,var57,var58,var59,var60,var61,var62,var63,var64,var65,var66,var67,var68,var69,var70,var71,var72,var73,var74,var75,var76,var77,var78,var79,var80,var81,]
+
+        table = [[0,7,0,0,2,0,0,4,6,0,6,0,0,0,0,8,9,0,2,0,0,8,0,0,7,1,5,0,8,4,0,9,7,0,0,0,7,1,0,0,0,0,0,5,9,0,0,0,1,3,0,4,8,0,6,9,7,0,0,2,0,0,8,0,5,8,0,0,0,0,6,0,4,3,0,0,8,0,0,7,0],
+                 [8,0,7,9,4,0,3,1,0,0,3,1,0,7,6,4,0,0,0,0,0,1,0,0,0,5,0,9,0,0,5,0,0,0,0,0,0,0,0,0,0,0,1,6,0,1,0,5,3,0,7,0,2,4,0,0,3,0,0,2,6,9,1,0,1,0,6,9,3,0,4,0,4,0,0,7,0,0,2,3,8],]
         tab_hori = [[0,1,2,3,4,5,6,7,8],[9,10,11,12,13,14,15,16,17],[18,19,20,21,22,23,24,25,26],[27,28,29,30,31,32,33,34,35],[36,37,38,39,40,41,42,43,44],[45,46,47,48,49,50,51,52,53],[54,55,56,57,58,59,60,61,62],[63,64,65,66,67,68,69,70,71],[72,73,74,75,76,77,78,79,80]]
         tab_ver = [[0,9,18,27,36,45,54,63,72],[1,10,19,28,37,46,55,64,73],[2,11,20,29,38,47,56,65,74],[3,12,21,30,39,48,57,66,75],[4,13,22,31,40,49,58,67,76],[5,14,23,32,41,50,59,68,77],[6,15,24,33,42,51,60,69,78],[7,16,25,34,43,52,61,70,79],[8,17,26,35,44,53,62,71,80]]
         tab_block = [[0,1,2,9,10,11,18,19,20],[3,4,5,12,13,14,21,22,23],[6,7,8,15,16,17,24,25,26],[27,28,29,36,37,38,45,46,47],[30,31,32,39,40,41,48,49,50],[33,34,35,42,43,44,51,52,53],[54,55,56,63,64,65,72,73,74],[57,58,59,66,67,68,75,76,77],[60,61,62,69,70,71,78,79,80]]
@@ -42,10 +39,15 @@ def Play():
                 return "%02d:%02d" % (minutes,seconds)
 
         def Congrats():
+                global i 
+                won = font3.render(f"You passed level {i+1}", True, black)
                 screen.fill(white)
-                won = font3.render("Congratulations!", True, black)
                 screen.blit(won, (100, 155))
-                        
+                pygame.display.update()
+                time.sleep(2)
+                if 0 < mouse[0] < 460 and 0 < mouse[1] < 370 and pygame.mouse.get_pressed():
+                        i += 1
+                        Play()
                 
                
         while True:
@@ -60,7 +62,7 @@ def Play():
                 pygame.draw.rect(screen,white,(25,25,410,275))
                 T_txt = font2.render(T_Count(T//6),True, black)
                 screen.blit(T_txt, (50,5))
-                for var in table:
+                for var in table[i]:
                         if var == 0:
                                 temp = font.render(str(" "), True, black)
                         elif index in wrongs:
@@ -94,16 +96,16 @@ def Play():
                 y = 1
                 def add_one(x):   
                     if x*45-15 < mouse[0] < x*45+25 and y*30 < mouse[1] < y*30+25:
-                        if table[(y*10+x)-y-10] == 9:
-                            table[(y*10+x)-y-10] = 1
+                        if table[i][(y*10+x)-y-10] == 9:
+                            table[i][(y*10+x)-y-10] = 1
                         else:
-                            table[(y*10+x)-y-10] += 1
+                            table[i][(y*10+x)-y-10] += 1
 
                             hor = [i for i in tab_hori[y-1] if i != (y*10+x)-y-10]
                             ver = [i for i in tab_ver[x-1] if i != (y*10+x)-y-10]
                             block = [i for i in tab_block[i_block[(y*10+x)-y-10]] if i!= (y*10+x)-y-10]
                             
-                            f = lambda i: (table[i] == table[(y*10+x)-y-10])
+                            f = lambda j: (table[i][j] == table[i][(y*10+x)-y-10])
                             
                             with concurrent.futures.ThreadPoolExecutor() as executor:
 
@@ -136,9 +138,8 @@ def Play():
                                     y += 1
                                     futures = executor.map(add_one, itr)
 
-                if sum(table) == 171 and not len(wrongs):
-                        Congrats()
-
+                if sum(table[i]) == 405 and not len(wrongs):
+                        Congrats()        
                 T += 1
                 pygame.display.update()
 
@@ -182,3 +183,4 @@ def Menu():
                 screen.blit(start_txt,(btn_x+45,btn_y))
                 pygame.display.update()
 Menu()
+
